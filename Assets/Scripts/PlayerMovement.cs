@@ -14,7 +14,11 @@ public class PlayerMovement : MonoBehaviour
     public float speed;
 
     public bool isGrounded;
-
+    bool facingRight = true;
+    public GameObject bulletToRight, bulletToLeft;
+    Vector2 bulletPos;
+    public float fireRate = 0.5f;
+    float nextFire = 0.0f;
 
     public void Start()
     {
@@ -32,12 +36,14 @@ public class PlayerMovement : MonoBehaviour
         Vector3 characterScale = transform.localScale;
         if (Input.GetAxis("Horizontal") < 0)
         {
+            facingRight = false;
             characterScale.x = -13;
             playerAnimState = PlayerAnimState.WALK;
             playerAnimator.SetInteger("AnimState", (int)PlayerAnimState.WALK);
         }
         if (Input.GetAxis("Horizontal") > 0)
         {
+            facingRight = true;
             characterScale.x = 13;
             playerAnimState = PlayerAnimState.WALK;
             playerAnimator.SetInteger("AnimState", (int)PlayerAnimState.WALK);
@@ -50,6 +56,13 @@ public class PlayerMovement : MonoBehaviour
             playerAnimState = PlayerAnimState.IDLE;
             playerAnimator.SetInteger("AnimState", (int)PlayerAnimState.IDLE);
         }
+
+        if (Input.GetButtonDown("Fire1") && Time.time > nextFire)
+        {
+            nextFire = Time.time + fireRate;
+            fire();
+        }
+
     }
 
     //Basic movement function
@@ -73,6 +86,21 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.tag == "Ground")
         {
             isGrounded = true;
+        }
+    }
+
+    void fire()
+    {
+        bulletPos = transform.position;
+        if (facingRight)
+        {
+            bulletPos += new Vector2(+1f, -0.23f);
+            Instantiate(bulletToRight, bulletPos, Quaternion.identity);
+        }
+        else
+        {
+            bulletPos += new Vector2(-1f, -0.23f);
+            Instantiate(bulletToLeft, bulletPos, Quaternion.identity);
         }
     }
 }
